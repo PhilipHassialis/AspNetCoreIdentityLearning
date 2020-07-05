@@ -17,22 +17,31 @@ namespace IdentityExample
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddAuthentication("MyCookie")
-            //     .AddCookie("MyCookie", options =>
-            //     {
-            //         options.Cookie.Name = "MyCookie.TheCookie";
-            //         options.LoginPath = "/Home/Authenticate";
-
-            //     });
             services.AddDbContext<AppDbContext>(config =>
             {
                 config.UseInMemoryDatabase("Memory");
             });
 
             // AddIdentity registers the services
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>(config =>
+            {
+                // change password requirements
+                config.Password.RequireDigit = false;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Password.RequiredLength = 3;
+                config.Password.RequiredUniqueChars = 0;
+                config.Password.RequireLowercase = false;
+                config.Password.RequireUppercase = false;
+            })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.Cookie.Name = "MyCookie";
+                config.LoginPath = "/Home/Login";
+            });
+
             services.AddControllersWithViews();
         }
 
