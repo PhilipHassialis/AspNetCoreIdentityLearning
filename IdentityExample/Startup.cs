@@ -28,7 +28,7 @@ namespace IdentityExample
             {
                 config.UseInMemoryDatabase("Memory");
             });
-            services.AddIdentity<IdentityUser, IdentityRole>();
+            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
             services.AddControllersWithViews();
         }
 
