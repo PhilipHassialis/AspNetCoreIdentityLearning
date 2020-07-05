@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace IdentityExample.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Secret()
         {
             return View();
@@ -30,6 +32,7 @@ namespace IdentityExample.Controllers
             return View();
         }
 
+        [HttpPost]
         public async Task<IActionResult> Login(string username, string password)
         {
             // login functionality
@@ -37,6 +40,13 @@ namespace IdentityExample.Controllers
             if (user != null)
             {
                 // sign in
+                var signInResult = await _signInManager.PasswordSignInAsync(user, password, false, false);
+
+                if (signInResult.Succeeded)
+                {
+                    return RedirectToAction("Index");
+
+                }
             }
             return RedirectToAction("Index");
         }
@@ -46,6 +56,7 @@ namespace IdentityExample.Controllers
             return View();
         }
 
+        [HttpPost]
         public async Task<IActionResult> Register(string username, string password)
         {
             // register functionality
@@ -59,8 +70,21 @@ namespace IdentityExample.Controllers
             if (result.Succeeded)
             {
                 // sign user here
+                var signInResult = await _signInManager.PasswordSignInAsync(user, password, false, false);
+
+                if (signInResult.Succeeded)
+                {
+                    return RedirectToAction("Index");
+
+                }
             }
 
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> LogOut()
+        {
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index");
         }
 
